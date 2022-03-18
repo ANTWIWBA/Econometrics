@@ -1,0 +1,218 @@
+---
+title: "Homework 4"
+author: "Bridget Antwiwaa"
+date: "2/22/2022"
+output: word_document
+---
+```{r}
+data1=read.csv(choose.files(), header = T)
+data2=data1[,c("earnings","height")]
+```
+
+**Qa**
+```{r}
+median(data1$height)
+```
+
+**Qb**
+
+**i**
+```{r}
+short= data2$earnings[data1$height<=67]
+mean(short)
+```
+
+**ii**
+```{r}
+tall=data2$earnings[data1$height>67]
+mean(tall)
+```
+
+**iii**
+
+On average taller workers earn more than shorter workers by $5499.44.
+
+```{r}
+t.test(x=tall, y=short, var.equal = T)
+```
+
+The 95% confidence is (4707.007, 6291.873)
+
+**Qc**
+```{r}
+plot(x=data1$height, y=data1$earnings, xlab = "height", ylab = "earnings", main = "Scatter plot of earning on height ", pch=21, bg="purple")
+```
+
+The points fall along a horizontal line with only 23 disticnt values of earnings is because the data was collected in 23 brackets.
+
+**Qd**
+```{r}
+reg1=lm(earnings~height, data = data2)
+summary(reg1)
+reg1$coefficients
+```
+
+The estimated slope is 707.6716 
+
+**worker who is 67, 70, 65: earning= 707.6716height + (-512.7336)**
+
+```{r}
+707.6716*(67) + (-512.7336)
+
+707.6716*(70) + (-512.7336)
+
+707.6716*(65) + (-512.7336)
+```
+
+**Qe**
+```{r}
+height.cm=data2$height*(2.54)
+reg.height.cm= lm(earnings~height.cm, data = data2)
+summary(reg.height.cm)
+reg.height.cm$coefficients
+```
+
+**i**
+The estimated slope is 278.6108
+
+**ii**
+The estimated intercept is -512.7336
+
+**iii**
+R^2 is 0.01088
+
+**iv**
+SER is 19.88
+
+**Qf**
+```{r}
+femData=subset(data1,sex==0)
+reg2=lm(earnings~height, data = femData)
+summary(reg2)
+```
+
+**i**
+The slope intercept is  511.2222
+
+**ii**
+```{r}
+mean(femData$height)
+```
+
+**average women**
+```{r}
+12650.8577+511.2222*(64.49278) 
+```
+
+**randomly selected women 1 in taller than average**
+```{r}
+64.49278+1
+12650.8577+511.2222*(65.49278)
+```
+
+You would predict that her earnings would be higher than the average by $511.22
+
+**Qg**
+```{r}
+maleData=subset(data1,sex==1)
+reg3=lm(earnings~height, data = maleData)
+summary(reg3)
+```
+
+The estimated slope is 1306.86
+
+**mean for men**
+```{r}
+mean(maleData$height)
+```
+
+**average male**
+```{r}
+-43130.34 +1306.86*(70.08409)
+```
+
+**randomdly selected male 1 in taller than average**
+```{r}
+70.08409+1
+-43130.34 +1306.86*(71.08409)
+```
+
+You would predict that his earnings would be higher than the average by $1306.86
+
+**Qh**
+
+Yes I do think that height is uncorrelated with the other factors that cause earnings. Therefore, the regression error term has a conditional mean of zero given height.  
+
+#Chapter 5
+
+**Qa**
+```{r}
+reg1=lm(earnings~height, data = data2)
+summary(reg1)
+```
+
+**ii**
+
+looking at the t-value (14.016), we reject the null making the estimated slope statisticaly significant 
+
+**ii**
+```{r}
+707.6716+1.96*(50.49)
+707.6716-1.96*(50.49)
+```
+
+The confidence interval is (608.7112,806.632)
+
+**Qb**
+```{r}
+femData=subset(data1,sex==0)
+reg2=lm(earnings~height, data = femData)
+summary(reg2)
+```
+
+looking at the t value (5.169), we reject the null so it is statistically significant
+
+**ii**
+```{r}
+511.2222 +1.96*(98.9)
+511.2222 -1.96*(98.9)
+```
+
+The confidence interval is (317.3782,705.0662)
+
+**Qc**
+```{r}
+maleData=subset(data1,sex==1)
+reg3=lm(earnings~height, data = maleData)
+summary(reg3)
+```
+
+looking at the t value (12.969), we reject the null so it is statistically significant
+
+**ii**
+```{r}
+1306.86  +1.96*(100.8)
+1306.86  -1.96*(100.8)
+```
+
+The confidence interval is (1109.292,1504.428)
+
+**Qe**
+
+Occupation1_height = contruction/minning(11)
+
+Occupation1_no.height = Administrat(5)
+
+```{r}
+construction.Data=subset(data1,occupation==11)
+reg4=lm(earnings~height, data = construction.Data)
+summary(reg4)
+```
+
+```{r}
+Administrat.Data=subset(data1,occupation==5)
+reg5=lm(earnings~height, data = Administrat.Data)
+summary(reg5)
+```
+
+The t-value for workers that require height (contruction) is 3.155, we reject the null so it is statistically significant. However, if you look at the t-value for workers that do not require height (Administrat), it is around 1.505 which we fail to reject the null so it is not statistically signnificant. With the 2 conclusion and the previous regressions, the effect of height on earnings does disappear when the sample is restricted to occupations in which strength is unlikely to be important.   
