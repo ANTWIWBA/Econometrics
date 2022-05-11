@@ -1,0 +1,122 @@
+---
+title: "Coding for final writeup-econ"
+author: "Bridget Antwiwaa"
+date: '2022-05-11'
+output: word_document
+---
+
+```{r}
+data1= read.csv(choose.files(), header = T)
+```
+
+calling my data
+```{r}
+GC = data1$Gasoline.Consumption
+PG = data1$Price.of.Gas
+rDPI = data1$Disposable.Personal.Income
+Pop= data1$population
+PCE=data1$Consumption.Expenditures
+Infla= data1$Inflation
+one.T= data1$One.year.treasury
+ten.T= data1$ten.year.treasury
+UR = data1$Unemployment.rate
+Year = data1$Year
+month = data1$Month
+date = data1$Date
+```
+
+per capital gasoline consuption variable (PCGC)
+```{r}
+data1$PCGC= (GC*42)/(Pop)
+```
+
+real retail price of gasoline (rPG)
+```{r}
+data2=subset(data1, Year == "2000")
+a=mean(data2[,8])
+PCE.deflator = PCE/a
+data1$rPG = PG/PCE.deflator
+```
+
+real per capital disposable income(rCPI)
+```{r}
+d2=subset(data1, Year == "2012")
+b=mean(d2[,8])
+PCE12.deflator = PCE/b
+data1$rCPI = (PCE12.deflator/PCE.deflator) *rDPI
+```
+
+create the 12 dummy variables
+```{r}
+data1$Jan = ifelse(month==1,1,0)
+data1$Feb =ifelse(month==2,1,0)
+data1$Mar= ifelse(month==3,1,0)
+data1$Apr= ifelse(month==4,1,0)
+data1$May= ifelse(month==5,1,0)
+data1$Jun= ifelse(month==6,1,0)
+data1$Jul= ifelse(month==7,1,0)
+data1$Aug= ifelse(month==8,1,0)
+data1$Sep= ifelse(month==9,1,0)
+data1$Oct= ifelse(month==10,1,0)
+data1$Nov= ifelse(month==11,1,0)
+data1$Dec= ifelse(month==12,1,0)
+```
+
+Descriptive statistics of 3 specific time periods
+```{r}
+date = as.Date(date)
+Time.d1 = subset(data1, date>="1975-11-01" & date<="1980-11-01")
+Time.d2 = subset(data1, date>="2001-03-01" & date<="2006-03-01")
+Time.d3 = subset(data1, date>="2016-11-01" & date<="2021-11-01")
+
+stargazer::stargazer(Time.d1, type = "text")
+stargazer::stargazer(Time.d2, type = "text")
+stargazer::stargazer(Time.d3, type = "text")
+```
+
+Time series graph of the main variables
+PCGC graph
+```{r}
+library(ggplot2)
+ggplot()+
+  geom_line(data = data1, mapping = aes(x=date,y=PCGC), col = "red")+xlab("Year")+ylab("Montly Gasoline Consumption")+theme(panel.border = element_blank(),panel.grid.major = element_blank(),panel.grid.minor
+= element_blank(),panel.background = element_blank(),axis.line = element_line(colour =
+"grey"))
+```
+
+rPG graph
+```{r}
+ggplot()+
+  geom_line(data = data1, mapping = aes(x=date,y=rPG), col = "blue")+xlab("Year")+ylab("Real Price")+theme(panel.border = element_blank(),panel.grid.major = element_blank(),panel.grid.minor
+= element_blank(),panel.background = element_blank(),axis.line = element_line(colour =
+"grey"))
+```
+
+real retail price for gasoline for 3 time periods
+```{r}
+Time.d1$obsn = 1:nrow(Time.d1)
+Time.d2$obsn = 1:nrow(Time.d2)
+Time.d3$obsn = 1:nrow(Time.d3)
+
+windows(width = 12, height = 10)
+ggplot(NULL, aes(obsn, rPG))+
+  geom_line(data =Time.d1, aes(col = "green"))+
+  geom_line(data =Time.d2, aes(col = "purple"))+
+  geom_line(data =Time.d3, aes(col = "gold"))+
+  scale_color_identity(name = "Subperiods", breaks = c("green", "purple", "gold"), labels =c("Nov75-Nov80", "Mar01-Mar06", "Feb15-Feb21"), guide = "legend")
+```
+
+The double logged model for the three time periods
+
+```{r}
+reg1=lm(log(PCGC)~log(rPG)+log(rCPI)+Jan+Feb+Mar+Apr+May+Jun+Jul+Aug +Sep+Oct+Nov,data = Time.d1)
+
+reg2=lm(log(PCGC)~log(rPG)+log(rCPI)+Jan+Feb+Mar+Apr+May+Jun+Jul+Aug +Sep+Oct+Nov,data = Time.d2)
+
+reg3=lm(log(PCGC)~log(rPG)+log(rCPI)+Jan+Feb+Mar+Apr+May+Jun+Jul+Aug +Sep+Oct+Nov,data = Time.d3)
+
+library(jtools)
+stargazer::stargazer(reg1,reg2,reg3, type = "text")
+```
+
+
